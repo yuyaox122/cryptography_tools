@@ -1,3 +1,4 @@
+import formatter
 import matplotlib.pyplot as plt
 
 def plot_frequencies(letters, frequencies):
@@ -29,5 +30,6 @@ def get_frequencies(cipher_text):
 
 if __name__ == '__main__':
     cipher_text = input()
+    cipher_text = formatter.standard_format_text(cipher_text)
     letters, frequencies = get_frequencies(cipher_text)
     plot_frequencies(letters, frequencies)

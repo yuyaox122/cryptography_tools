@@ -1,2 +1,58 @@
-def quadgram_fitness(plain_text):
-    return
+import formatter
+import math
+import random
+
+def english_quadgram():
+    f = open(r'C:\\Users\\yuyao\\OneDrive\\Documents\\Cryptography\\cryptography_tools\\data\\english_quadgrams.txt', 'r')
+    N = 0
+    quadgram_score = {}
+    for line in f:
+        quadgram_score[line.split(' ')[0]] = int(line.split(' ')[1].strip())
+        N += int(line.split(' ')[1].strip())
+    return quadgram_score, N
+
+def quadgram_fitness(plain_text, quadgram_score, N):
+    fitness = 0
+    for i in range(len(plain_text) - 3):
+        quadgram = plain_text[i:i + 4]
+        if quadgram in quadgram_score:
+            fitness += math.log10((quadgram_score[quadgram] / N))
+        else:
+            fitness += math.log10(0.01 / N)
+    return fitness
+
+def substitute(text, key):
+    return ''.join([key[ord(i) - ord('A')] for i in text])
+
+def monoalphabetic_decoder(cipher_text, quadgram_score, N):
+    parent_key = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    parent_fitness = quadgram_fitness(substitute(cipher_text, parent_key), quadgram_score, N)
+    best_key = parent_key
+    best_fitness = parent_fitness
+    count = 0
+    while count < 5000:
+        child_key = parent_key
+        index1 = int(math.floor(26 * random.random()))
+        index2 = int(math.floor(26 * random.random()))
+        child_key = list(child_key)
+        child_key[index1], child_key[index2] = child_key[index2], child_key[index1]
+        child_key = ''.join(child_key)
+
+        child_fitness = quadgram_fitness(substitute(cipher_text, child_key), quadgram_score, N)
+        
+        if child_fitness > best_fitness:
+            best_fitness = child_fitness
+            best_key = child_key
+            parent_key = child_key
+            parent_fitness = child_fitness
+            count = 0
+            # print(best_key)
+            print(child_fitness)
+        count += 1
+    return substitute(cipher_text, best_key)
+
+if __name__ == '__main__':
+    cipher_text = input()
+    quadgram_score, N = english_quadgram()
+    plain_text = monoalphabetic_decoder(formatter.standard_format_text(cipher_text), quadgram_score, N)
+    print(formatter.standard_reformat_text(cipher_text, plain_text))

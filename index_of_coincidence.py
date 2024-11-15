@@ -4,7 +4,8 @@ def get_index_of_coincidence(plain_text):
     ic = 0
     for i in range(26):
         n = plain_text.count(chr(i + ord('A')))
-        ic += n * (n - 1) / (len(plain_text) * (len(plain_text) - 1))
+        if n > 1:
+            ic += n * (n - 1) / (len(plain_text) * (len(plain_text) - 1))
     return ic
         
 if __name__ == '__main__':

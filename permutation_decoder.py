@@ -21,7 +21,7 @@ def quadgram_fitness(plain_text, quadgram_score, N):
             fitness += math.log10(0.01 / N)
     return fitness
 
-def decipher(cipher_text, key):
+def permutation_decipher(cipher_text, key):
     plain_text = ''
     for i in range(len(cipher_text) // len(key)):
         block = cipher_text[i * len(key):(i + 1) * len(key)]
@@ -29,7 +29,7 @@ def decipher(cipher_text, key):
             plain_text += block[key[j]]
     return plain_text
         
-def permutation_decoder(cipher_text, key, quadgram_score, N):
+def permutation_hill_climb(cipher_text, key, quadgram_score, N):
     best_fitness = quadgram_fitness(cipher_text, quadgram_score, N)
     parent_key = key.copy()
     counter = 0
@@ -43,7 +43,7 @@ def permutation_decoder(cipher_text, key, quadgram_score, N):
             cut = random.randint(1, len(child_key) - 1)
             child_key = child_key[cut:] + child_key[:cut]
 
-        plain_text = decipher(cipher_text, child_key)
+        plain_text = permutation_decipher(cipher_text, child_key)
         new_fitness = quadgram_fitness(plain_text, quadgram_score, N)
         print(new_fitness)
         if new_fitness > best_fitness or (new_fitness > best_fitness * 0.9 and random.randint(1, 20) == 1):
@@ -55,12 +55,12 @@ def permutation_decoder(cipher_text, key, quadgram_score, N):
             counter += 1
     print(parent_key)
     print(best_fitness)
-    return decipher(cipher_text, parent_key)
+    return permutation_decipher(cipher_text, parent_key)
 
 if __name__ == '__main__':
     cipher_text = input()
     quadgram_score, N = english_quadgram()
-    key = list(range(12))
-    plain_text = permutation_decoder(formatter.standard_format_text(cipher_text), key, quadgram_score, N)
+    key = list(range(6))
+    plain_text = permutation_hill_climb(formatter.standard_format_text(cipher_text), key, quadgram_score, N)
     print("\n" + formatter.standard_reformat_text(cipher_text, plain_text))
     
